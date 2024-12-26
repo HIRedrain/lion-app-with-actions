@@ -27,23 +27,23 @@ jobs:
         run: mv ./target/*.jar ./target/app.jar
 
       - name: Check jar file
-        run: ls ./target
+        run: ls ./target  # target 디렉토리 내에 파일들이 있는지 확인
 
       - name: Upload app.jar as artifact
         uses: actions/upload-artifact@v4
         with:
           name: app.jar
-          path: ./target/app.jar  # 지정된 경로로 업로드
+          path: ./target/app.jar  # 정확한 경로를 지정하여 업로드
 
   download-artifact:
     runs-on: ubuntu-latest
-    needs: upload-artifact  # 업로드가 완료된 후 실행
+    needs: upload-artifact  # 업로드 작업이 완료된 후 실행
 
     steps:
       - uses: actions/download-artifact@v3
         with:
           name: app.jar
-          path: ./downloads  # 다운로드한 파일을 저장할 경로 지정
+          path: ./downloads  # 다운로드된 파일이 저장될 경로 지정
 
       - name: From Github Actions to AWS EC2 through SCP
         uses: appleboy/scp-action@v0.1.7
@@ -51,7 +51,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: ./downloads/app.jar  # 다운로드된 파일 경로 지정
+          source: ./downloads/app.jar  # 다운로드된 파일 경로
           target: /home/ubuntu/app
 
       - name: Connecting EC2 through SSH
