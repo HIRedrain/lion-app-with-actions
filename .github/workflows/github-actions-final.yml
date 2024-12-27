@@ -64,3 +64,4 @@ jobs:
           sudo fuser -k -n tcp 8080 || true
           cd /home/ubuntu/app/deploy
           nohup java -jar app.jar > ./output.log 2>&1 &
+
