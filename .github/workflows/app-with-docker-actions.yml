@@ -64,7 +64,7 @@ jobs:
           script: |
             mkdir -p /home/ubuntu/app/docker
             cd /home/ubuntu/app/docker
-            sudo fuser =k -n tcp 8080 || true
+            sudo fuser -k -n tcp 8080 || true
             sudo docker image prune -f
             sudo docker container prune -f
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/lion-app-with-actions:latest
