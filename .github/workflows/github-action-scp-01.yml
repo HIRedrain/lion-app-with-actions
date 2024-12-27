@@ -1,5 +1,7 @@
 name: scp files from actions To EC2
-on: [push]
+on: 
+  workflow_dispatch
+  # [push]
 jobs:
   build:
     name: Build
