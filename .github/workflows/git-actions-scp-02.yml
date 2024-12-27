@@ -1,0 +1,44 @@
+name: Deploy Artifact to EC2
+
+on:
+  workflow_dispatch  # 수동 실행, 혹은 필요한 이벤트로 변경 가능
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Artifact 다운로드
+    - name: Download app.jar from Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: app.jar  # 위에서 업로드한 이름으로 다운로드
+        path: ./target  # 다운로드할 경로 지정
+
+    # EC2로 파일 전송
+    - name: From Github Actions to AWS EC2 through SCP
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: ./target/app.jar  # 다운로드한 app.jar 경로
+        target: /home/ubuntu/app
+
+    # EC2에서 Java 애플리케이션 실행
+    - name: Connecting EC2 through SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script_stop: true
+        script: |
+          rm -rf /home/ubuntu/app/deploy
+          mkdir -p /home/ubuntu/app/deploy
+          mv /home/ubuntu/app/app.jar /home/ubuntu/app/deploy/app.jar
+          sudo fuser -k -n tcp 8080 || true
+          nohup java -jar /home/ubuntu/app/deploy/app.jar > /home/ubuntu/app/deploy/output.log 2>&1 &
