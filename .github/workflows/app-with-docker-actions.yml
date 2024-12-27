@@ -67,7 +67,7 @@ jobs:
             sudo fuser -k -n tcp 8080 || true
             sudo docker stop $(sudo docker ps -aq)
             sudo docker container prune -f
-            sudo docker image prune -f
+            sudo docker rmi $(sudo docker images -aq)
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/lion-app-with-actions:latest
             sudo docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/lion-app-with-actions:latest
   
